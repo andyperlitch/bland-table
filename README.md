@@ -10,13 +10,13 @@ Node module for creating interactive html tables.
     }
     var columns = [
         {
-            id: "row_id"
-            format: "id", 
-            label: "Row ID",
-            search: function(term, value) { return value == term } ,
+            id: "row_id"  // required: unique for only this column (String)
+            format: "id", // required: function for calculated cell value or key of data obj (String or Function)
+            label: "Row ID", // optional: label for th, if absent, id used (String)
+            filter: function(term, value) { return value == term } , // optional: will add a filter field to top of column
             sort: { 
                 a: function(row1,row2) { return row1.id <= row2.id }, 
-                b: function(row1,row2) { return row1.id >= row2.id },
+                d: function(row1,row2) { return row1.id >= row2.id },
                 start: "a"
             }
         },
@@ -24,10 +24,10 @@ Node module for creating interactive html tables.
             id: "name",
             format: function(row) { return row.first + " " + row.last },
             label: "Full Name",
-            search: function(term, value, row) { return value.indexOf(term) > -1 },
+            filter: function(term, value, row) { return value.indexOf(term) > -1 },
             sort: {
                 a: function(row1,row2) { return row1.b > row.a },
-                b: function(row1,row2) { return row1.b < row.a }
+                d: function(row1,row2) { return row1.b < row.a }
             }
         }
     ];
@@ -58,6 +58,6 @@ Node module for creating interactive html tables.
 - order-able columns, asc or desc
 - resizable columns
     - resize on double-click right edge
-- filter search fields
+- filter fields
 - format functions for cells
 - updatable data

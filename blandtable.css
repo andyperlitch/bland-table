@@ -1,0 +1,15 @@
+.bland-table .th {
+  position: relative;
+}
+.bland-table .th .resize {
+  display: block;
+  border-width: 0 1px 0 1px;
+  border-color: #CCC;
+  border-style: solid;
+  width: 1px;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: col-resize;
+}
