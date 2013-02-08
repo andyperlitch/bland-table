@@ -13,3 +13,7 @@
   top: 0;
   cursor: col-resize;
 }
+.bland-table .th.asc,
+.bland-table .th.desc {
+  font-style: italic;
+}

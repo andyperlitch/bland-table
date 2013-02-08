@@ -18,8 +18,8 @@ var columns = [
         format: function(row) { return row.first + " " + row.last },
         filter: function(term, value, row) { return value.indexOf(term) > -1 },
         sort: {
-            a: function(row1,row2) { return row1.b > row.a },
-            d: function(row1,row2) { return row1.b < row.a }
+            a: function(row1,row2) { return row1.first < row2.first },
+            d: function(row1,row2) { return row1.first > row2.first }
         }
     }
 ];

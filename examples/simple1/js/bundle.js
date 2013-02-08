@@ -405,7 +405,7 @@ var BlandTable = function() {
     var $filter_row;
     var $tbody;
     var columns = [];  // private copies of columns
-    var filters = {}; // current filter functions to act upon dataset
+    var filters = {};  // current filter functions to act upon dataset
     
     // public properties
     this.columns = [];
@@ -432,17 +432,18 @@ var BlandTable = function() {
         $header_row = $('<tr>').appendTo( $thead );
         $filter_row = $('<tr>').appendTo( $thead );
         $tbody = $('<tbody>').appendTo( $table );
-        
         initIfReady();
     }
     this.init = function() {
         render();
+        set_listeners();
     }
     
     // private methods
     var initIfReady = function() {
         if ( self.el && self.columns.length ) self.init();
     }
+    
     var render = function() {
         // check that columns and $el is set
         if (!self.columns.length || !self.$el.length ) return;
@@ -462,27 +463,27 @@ var BlandTable = function() {
         }
         self.columns = columns;
     }
-    var render_rows = function() {
-        $tbody.empty();
-        for (var i = 0; i < self.data.length; i++) {
-            var $row = create_row(self.data[i]);
-            if ($row instanceof $) $row.appendTo($tbody);
-        }
-    }
-    
-    // creates th element with sort listeners,
-    // if specified by column object
     var create_header = function(column) {
         var $th = $('<th>',{'class':'th'});
         var label = column.label || column.id;
         if (column.sort) {
             label = '<a href="#" class="sortlabel">'+label+'</a><a href="#" class="resize"></a>';
+            $th.html(label);
+            $th.on("click",".sortlabel",function(evt){
+                var class_to_add = $th.hasClass("desc") ? "asc" : "desc" ;
+                var key = class_to_add.charAt(0);
+                $header_row.find("th").removeClass("asc desc");
+                $th.addClass(class_to_add);
+                self.data.sort(column.sort[key]);
+                render_rows();
+            });
         }
-        $th.html(label);
+        else {
+            $th.html(label);
+        }
+        
         return $th;
     }
-    // creates td element with filter field, 
-    // if specified by column object
     var create_filter = function(column) {
         var $td = $('<td>');
         var filter = false;
@@ -494,14 +495,13 @@ var BlandTable = function() {
                 filter = filterFunctions[column.filter] || false;
             break;
         }
-        $.data($td[0],'filter',filter);
         if (filter === false) return $td;
         
         // add filter field
         var placeholder = column.placeholder || 'filter';
         var $filter = $('<input type="search" placeholder="'+placeholder+'" />');
         var searchVal = '';
-        $filter.on("keyup",function(evt){
+        $filter.on("keyup click",function(evt){
             var term = $.trim(this.value);
             if (term == searchVal) return;
             searchVal = term;
@@ -511,8 +511,6 @@ var BlandTable = function() {
         $filter.appendTo($td);
         return $td;
     }
-    // takes column id and filter function and
-    // filters rendered rows down to those that match.
     var add_filter = function(id, filterFn, term) {
         filters[id] = { fn: filterFn, term: term };
         render_rows();
@@ -521,7 +519,13 @@ var BlandTable = function() {
         delete filters[id];
         render_rows();
     }
-
+    var render_rows = function() {
+        $tbody.empty();
+        for (var i = 0; i < self.data.length; i++) {
+            var $row = create_row(self.data[i]);
+            if ($row instanceof $) $row.appendTo($tbody);
+        }
+    }
     var create_row = function(rowdata) {
         var rowHtml = '<tr>';
         for ( var k = 0; k < columns.length; k++) {
@@ -538,7 +542,9 @@ var BlandTable = function() {
         rowHtml += '</tr>';
         return $(rowHtml);
     }
-    
+    var set_listeners = function() {
+        
+    }
 
 }
 exports = module.exports = BlandTable;
@@ -572,8 +578,8 @@ var columns = [
         format: function(row) { return row.first + " " + row.last },
         filter: function(term, value, row) { return value.indexOf(term) > -1 },
         sort: {
-            a: function(row1,row2) { return row1.b > row.a },
-            d: function(row1,row2) { return row1.b < row.a }
+            a: function(row1,row2) { return row1.first < row2.first },
+            d: function(row1,row2) { return row1.first > row2.first }
         }
     }
 ];

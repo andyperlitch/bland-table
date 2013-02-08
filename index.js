@@ -72,8 +72,20 @@ var BlandTable = function() {
         var label = column.label || column.id;
         if (column.sort) {
             label = '<a href="#" class="sortlabel">'+label+'</a><a href="#" class="resize"></a>';
+            $th.html(label);
+            $th.on("click",".sortlabel",function(evt){
+                var class_to_add = $th.hasClass("desc") ? "asc" : "desc" ;
+                var key = class_to_add.charAt(0);
+                $header_row.find("th").removeClass("asc desc");
+                $th.addClass(class_to_add);
+                self.data.sort(column.sort[key]);
+                render_rows();
+            });
         }
-        $th.html(label);
+        else {
+            $th.html(label);
+        }
+        
         return $th;
     }
     var create_filter = function(column) {
@@ -87,14 +99,13 @@ var BlandTable = function() {
                 filter = filterFunctions[column.filter] || false;
             break;
         }
-        $.data($td[0],'filter',filter);
         if (filter === false) return $td;
         
         // add filter field
         var placeholder = column.placeholder || 'filter';
         var $filter = $('<input type="search" placeholder="'+placeholder+'" />');
         var searchVal = '';
-        $filter.on("keyup",function(evt){
+        $filter.on("keyup click",function(evt){
             var term = $.trim(this.value);
             if (term == searchVal) return;
             searchVal = term;
@@ -136,9 +147,7 @@ var BlandTable = function() {
         return $(rowHtml);
     }
     var set_listeners = function() {
-        $thead.on("click",".sortlabel",function(evt){
-            console.log(this,$(this));
-        });
+        
     }
 
 }
