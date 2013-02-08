@@ -1,0 +1,3 @@
+- sort functions for rows
+- resize to fit content on double click
+- resize table on container resize
