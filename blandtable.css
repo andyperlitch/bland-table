@@ -1,12 +1,17 @@
+.bland-table {
+  width: 100%;
+}
 .bland-table .th {
   position: relative;
+  cursor: move;
+  padding-left: 11px;
 }
 .bland-table .th .resize {
   display: block;
   border-width: 0 1px 0 1px;
   border-color: #CCC;
   border-style: solid;
-  width: 1px;
+  width: 3px;
   height: 100%;
   position: absolute;
   right: 0;
@@ -16,4 +21,23 @@
 .bland-table .th.asc,
 .bland-table .th.desc {
   font-style: italic;
+}
+.bland-table .th .asc-icon,
+.bland-table .th .desc-icon {
+  background-image: url('blandtable_icons.png');
+  width: 10px;
+  height: 8px;
+  display: inline-block;
+}
+.bland-table .th .asc-icon {
+  background-position: 0px 0px;
+}
+.bland-table .th .asc-icon.white {
+  background-position: 0px -8px;
+}
+.bland-table .th .desc-icon {
+  background-position: -10px 0px;
+}
+.bland-table .th .desc-icon.white {
+  background-position: -10px -8px;
 }

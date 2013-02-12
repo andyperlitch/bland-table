@@ -1,12 +1,15 @@
 .bland-table {
+	width:100%;
 	.th {
 		position:relative;
+		cursor:move;
+		padding-left:11px;
 		.resize {
 			display:block;
 			border-width: 0 1px 0 1px;
 			border-color:#CCC;
 			border-style: solid;
-			width:1px;
+			width:3px;
 			height:100%;
 			position:absolute;
 			right:0;
@@ -15,6 +18,24 @@
 		}
 		&.asc,&.desc {
 			font-style:italic;
+		}
+		.asc-icon, .desc-icon {
+			background-image: url('blandtable_icons.png');
+			width:10px;
+			height:8px;
+			display:inline-block;
+		}
+		.asc-icon {
+			background-position:0px 0px;
+			&.white {
+				background-position:0px -8px;
+			}
+		}
+		.desc-icon {
+			background-position:-10px 0px;
+			&.white {
+				background-position:-10px -8px;
+			}
 		}
 	}
 	

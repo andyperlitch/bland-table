@@ -7,8 +7,8 @@ var columns = [
         format: "id", // required: function for calculated cell value or key of data obj (String or Function)
         filter: function(term, value) { return value == term } , // optional: will add a filter field to top of column
         sort: { 
-            a: function(row1,row2) { return row1.id <= row2.id }, 
-            d: function(row1,row2) { return row1.id >= row2.id },
+            a: function(row1,row2) { return row1.id >= row2.id }, 
+            d: function(row1,row2) { return row1.id <= row2.id },
             start: "a"
         }
     },
@@ -18,8 +18,8 @@ var columns = [
         format: function(row) { return row.first + " " + row.last },
         filter: function(term, value, row) { return value.indexOf(term) > -1 },
         sort: {
-            a: function(row1,row2) { return row1.first < row2.first },
-            d: function(row1,row2) { return row1.first > row2.first }
+            a: function(row1,row2) { return row1.first > row2.first },
+            d: function(row1,row2) { return row1.first < row2.first }
         }
     }
 ];

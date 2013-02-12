@@ -466,14 +466,16 @@ var BlandTable = function() {
     var create_header = function(column) {
         var $th = $('<th>',{'class':'th'});
         var label = column.label || column.id;
+        var mouseX = 0;
         if (column.sort) {
             label = '<a href="#" class="sortlabel">'+label+'</a><a href="#" class="resize"></a>';
             $th.html(label);
             $th.on("click",".sortlabel",function(evt){
                 var class_to_add = $th.hasClass("desc") ? "asc" : "desc" ;
                 var key = class_to_add.charAt(0);
-                $header_row.find("th").removeClass("asc desc");
+                $header_row.find("th").removeClass("asc desc").find('.asc-icon,.desc-icon').remove();
                 $th.addClass(class_to_add);
+                $th.prepend('<i class="'+class_to_add+'-icon"></i> ');
                 self.data.sort(column.sort[key]);
                 render_rows();
             });
@@ -481,6 +483,26 @@ var BlandTable = function() {
         else {
             $th.html(label);
         }
+        
+        var mousemove = function(evt) {
+            $th.width((this.col_width + evt.clientX - mouseX) + "px");
+        }
+        var mouseup = function(evt) {
+            $table.off("mousemove");
+            $table.off("mouseup");
+            $table.off("mouseout");
+        }
+        var cleanup = function(evt) {
+            $table.off("mousemove");
+            $(".th, tr, thead",$table).on("mouseout");
+        }
+        $th.on("mousedown",".resize",function(evt){
+            evt.preventDefault();
+            var col_width = $th.width();
+            mouseX = evt.clientX;
+            $table.on("mousemove", mousemove.bind({col_width:col_width}));
+            $(window).one("mouseup",cleanup);
+        });
         
         return $th;
     }
@@ -567,8 +589,8 @@ var columns = [
         format: "id", // required: function for calculated cell value or key of data obj (String or Function)
         filter: function(term, value) { return value == term } , // optional: will add a filter field to top of column
         sort: { 
-            a: function(row1,row2) { return row1.id <= row2.id }, 
-            d: function(row1,row2) { return row1.id >= row2.id },
+            a: function(row1,row2) { return row1.id >= row2.id }, 
+            d: function(row1,row2) { return row1.id <= row2.id },
             start: "a"
         }
     },
@@ -578,8 +600,8 @@ var columns = [
         format: function(row) { return row.first + " " + row.last },
         filter: function(term, value, row) { return value.indexOf(term) > -1 },
         sort: {
-            a: function(row1,row2) { return row1.first < row2.first },
-            d: function(row1,row2) { return row1.first > row2.first }
+            a: function(row1,row2) { return row1.first > row2.first },
+            d: function(row1,row2) { return row1.first < row2.first }
         }
     }
 ];
