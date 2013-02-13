@@ -425,6 +425,8 @@ var BlandTable = function() {
     this.to = function( el ) {
         this.el = el;
         this.$el = $(el);
+        console.log("width(): " + this.$el.width());
+        console.log("css('width'): " + this.$el.css('width'));
         
         // set up base elements
         $table = $('<table>',{ 'class': 'bland-table' }).appendTo( this.$el );

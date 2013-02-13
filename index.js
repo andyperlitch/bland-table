@@ -16,6 +16,7 @@ var BlandTable = function() {
     this.data = [];
     this.el;
     this.$el;
+    this.ctnrWidth;
     
     // public methods
     this.setColumns = function( columns ) {
@@ -29,6 +30,7 @@ var BlandTable = function() {
     this.to = function( el ) {
         this.el = el;
         this.$el = $(el);
+        this.ctnrWidth = this.$el.width();
         
         // set up base elements
         $table = $('<table>',{ 'class': 'bland-table' }).appendTo( this.$el );
