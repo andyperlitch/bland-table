@@ -1,10 +1,22 @@
 .bland-table {
   width: 100%;
 }
+.bland-table .tr .th,
+.bland-table .tr .td {
+  display: inline-block;
+  overflow: hidden;
+}
+.bland-table .tr .cell-inner {
+  padding: 5px 7px;
+}
+.bland-table input.filter {
+  width: 100%;
+}
 .bland-table .th {
   position: relative;
   cursor: move;
-  padding-left: 11px;
+  /*		padding-left:11px;*/
+
 }
 .bland-table .th .resize {
   display: block;
