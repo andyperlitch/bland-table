@@ -11,7 +11,7 @@ var columns = [
             d: function(row1,row2) { return row1.id <= row2.id },
             start: "a"
         },
-        width: 10
+        width: 50
     },
     {
         id: "name",

@@ -1,9 +1,11 @@
 .bland-table {
-	width:100%;
 	.tr {
+		width:100%;
+		
 		.th, .td {
 			display:inline-block;
 			overflow:hidden;
+			height:1.7em;
 		}
 		.cell-inner {
 			padding:5px 7px;
@@ -17,10 +19,12 @@
 	}
 	input.filter {
 		width:100%;
+		max-width:200px;
 	}
 	.th {
 		position:relative;
-		cursor:move;
+		cursor:-webkit-grab; 
+		cursor: -moz-grab;
 /*		padding-left:11px;*/
 		.resize {
 			display:block;
@@ -56,5 +60,4 @@
 			}
 		}
 	}
-	
 }
