@@ -10,7 +10,8 @@ var columns = [
             a: function(row1,row2) { return row1.id >= row2.id }, 
             d: function(row1,row2) { return row1.id <= row2.id },
             start: "a"
-        }
+        },
+        width: 50
     },
     {
         id: "name",

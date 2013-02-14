@@ -1,5 +1,5 @@
 var filterFunctions = require('./lib/filterFunctions');
-var BlandTable = function() {
+var BlandTable = function(options) {
     
     // private properties
     var self = this;
@@ -11,7 +11,15 @@ var BlandTable = function() {
     var columns = [];  // private copies of columns
     var filters = {};  // current filter functions to act upon dataset
     
+    
     // public properties
+    this.config = $.extend(
+        {},
+        {
+            min_col_width: 40
+        },
+        options
+    );
     this.columns = [];
     this.data = [];
     this.el;
@@ -31,13 +39,14 @@ var BlandTable = function() {
         this.el = el;
         this.$el = $(el);
         this.ctnrWidth = this.$el.width();
+        setColumnWidths();
         
         // set up base elements
-        $table = $('<table>',{ 'class': 'bland-table' }).appendTo( this.$el );
-        $thead = $('<thead>').appendTo( $table );
-        $header_row = $('<tr>').appendTo( $thead );
-        $filter_row = $('<tr>').appendTo( $thead );
-        $tbody = $('<tbody>').appendTo( $table );
+        $table = $('<div>',{ 'class': 'bland-table', 'style': 'width:' + this.ctnrWidth + 'px;' }).appendTo( this.$el );
+        $thead = $('<div>',{ 'class': 'thead' }).appendTo( $table );
+        $header_row = $('<div>',{ 'class': 'tr' }).appendTo( $thead );
+        $filter_row = $('<div>',{ 'class': 'tr' }).appendTo( $thead );
+        $tbody = $('<div>',{ 'class': 'tbody' }).appendTo( $table );
         initIfReady();
     }
     this.init = function() {
@@ -49,7 +58,18 @@ var BlandTable = function() {
     var initIfReady = function() {
         if ( self.el && self.columns.length ) self.init();
     }
-    
+    var setColumnWidths = function() {
+        var totalWidth = self.ctnrWidth;
+        var makeDefault = [];
+        self.columns.forEach(function(column, key){
+            if (column.width !== undefined) totalWidth -= column.width;
+            else makeDefault.push(column);
+        });
+        var defaultWidth = Math.floor(totalWidth/makeDefault.length) ;
+        makeDefault.forEach(function(column, key){
+            column.width = defaultWidth;
+        });
+    }
     var render = function() {
         // check that columns and $el is set
         if (!self.columns.length || !self.$el.length ) return;
@@ -70,50 +90,55 @@ var BlandTable = function() {
         self.columns = columns;
     }
     var create_header = function(column) {
-        var $th = $('<th>',{'class':'th'});
+        // make el
+        var $th = $('<div>',{'class':'th col-'+column.id, 'style': 'width:'+column.width+'px;'});
         var label = column.label || column.id;
-        var mouseX = 0;
+        label = label.split(" ").join("&nbsp;");
+
+
         if (column.sort) {
             label = '<a href="#" class="sortlabel">'+label+'</a><a href="#" class="resize"></a>';
-            $th.html(label);
+            $th.html('<div class="cell-inner">'+label+'</div>');
             $th.on("click",".sortlabel",function(evt){
                 var class_to_add = $th.hasClass("desc") ? "asc" : "desc" ;
                 var key = class_to_add.charAt(0);
-                $header_row.find("th").removeClass("asc desc").find('.asc-icon,.desc-icon').remove();
+                $header_row.find(".th").removeClass("asc desc").find('.asc-icon,.desc-icon').remove();
                 $th.addClass(class_to_add);
-                $th.prepend('<i class="'+class_to_add+'-icon"></i> ');
+                $th.find("cell-inner").prepend('<i class="'+class_to_add+'-icon"></i> ');
                 self.data.sort(column.sort[key]);
                 render_rows();
             });
         }
         else {
-            $th.html(label);
+            $th.html('<div class="cell-inner">'+label+'</div>');
         }
         
+        var mouseX = 0;
+        var mmContext = {};
         var mousemove = function(evt) {
-            $th.width((this.col_width + evt.clientX - mouseX) + "px");
-        }
-        var mouseup = function(evt) {
-            $table.off("mousemove");
-            $table.off("mouseup");
-            $table.off("mouseout");
+            var change = evt.clientX - mouseX;
+            var newWidth = mmContext.col_width + change;
+            if ( newWidth < self.config.min_col_width ) return;
+            column.width = newWidth;
+            $table.width( mmContext.tbl_width + change );
+            $(".col-"+column.id, $table).css('width',newWidth+'px');
         }
         var cleanup = function(evt) {
-            $table.off("mousemove");
-            $(".th, tr, thead",$table).on("mouseout");
+            $(window).off("mousemove", mousemove);
         }
         $th.on("mousedown",".resize",function(evt){
             evt.preventDefault();
-            var col_width = $th.width();
+            mmContext.col_width = $th.width();
+            mmContext.tbl_width = $table.width();
             mouseX = evt.clientX;
-            $table.on("mousemove", mousemove.bind({col_width:col_width}));
+            $(window).on("mousemove", mousemove);
             $(window).one("mouseup",cleanup);
         });
         
         return $th;
     }
     var create_filter = function(column) {
-        var $td = $('<td>');
+        var $td = $('<div class="td col-'+column.id+'" style="width:'+column.width+'px;"><div class="cell-inner"></div></div>');
         var filter = false;
         switch ( typeof column.filter ) {
             case "function":
@@ -127,7 +152,7 @@ var BlandTable = function() {
         
         // add filter field
         var placeholder = column.placeholder || 'filter';
-        var $filter = $('<input type="search" placeholder="'+placeholder+'" />');
+        var $filter = $('<input>',{ 'class': 'filter', 'type':'search','placeholder':placeholder });
         var searchVal = '';
         $filter.on("keyup click",function(evt){
             var term = $.trim(this.value);
@@ -136,7 +161,7 @@ var BlandTable = function() {
             remove_filter(column.id);
             if (term) add_filter(column.id, filter, term);
         });
-        $filter.appendTo($td);
+        $filter.appendTo($td.find(".cell-inner"));
         return $td;
     }
     var add_filter = function(id, filterFn, term) {
@@ -155,7 +180,7 @@ var BlandTable = function() {
         }
     }
     var create_row = function(rowdata) {
-        var rowHtml = '<tr>';
+        var rowHtml = '<div class="tr">';
         for ( var k = 0; k < columns.length; k++) {
             // get column object
             var column = columns[k];
@@ -165,9 +190,9 @@ var BlandTable = function() {
             if (filters.hasOwnProperty(column.id)) {
                 if ( ! filters[column.id].fn( filters[column.id].term , cell_value, rowdata ) ) return;
             }
-            rowHtml += '<td>'+cell_value+'</td>';
+            rowHtml += '<div class="td col-'+column.id+'" style="width:'+column.width+'px;"><div class="cell-inner">'+cell_value+'</div></div>';
         }
-        rowHtml += '</tr>';
+        rowHtml += '</div>';
         return $(rowHtml);
     }
     var set_listeners = function() {

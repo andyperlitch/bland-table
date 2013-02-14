@@ -1,10 +1,25 @@
-.bland-table {
+.bland-table .tr {
   width: 100%;
+}
+.bland-table .tr .th,
+.bland-table .tr .td {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.7em;
+}
+.bland-table .tr .cell-inner {
+  padding: 5px 7px;
+}
+.bland-table input.filter {
+  width: 100%;
+  max-width: 200px;
 }
 .bland-table .th {
   position: relative;
-  cursor: move;
-  padding-left: 11px;
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+  /*		padding-left:11px;*/
+
 }
 .bland-table .th .resize {
   display: block;
