@@ -493,20 +493,20 @@ var BlandTable = function(options) {
 
 
         if (column.sort) {
-            label = '<a href="#" class="sortlabel">'+label+'</a><a href="#" class="resize"></a>';
-            $th.html('<div class="cell-inner">'+label+'</div>');
+            label = '<a href="#" class="sortlabel">'+label+'</a>';
+            $th.html('<div class="cell-inner">'+label+'</div><a href="#" class="resize"></a>');
             $th.on("click",".sortlabel",function(evt){
                 var class_to_add = $th.hasClass("desc") ? "asc" : "desc" ;
                 var key = class_to_add.charAt(0);
                 $header_row.find(".th").removeClass("asc desc").find('.asc-icon,.desc-icon').remove();
                 $th.addClass(class_to_add);
-                $th.find("cell-inner").prepend('<i class="'+class_to_add+'-icon"></i> ');
+                $th.find(".cell-inner").prepend('<i class="'+class_to_add+'-icon"></i> ');
                 self.data.sort(column.sort[key]);
                 render_rows();
             });
         }
         else {
-            $th.html('<div class="cell-inner">'+label+'</div>');
+            $th.html('<div class="cell-inner">'+label+'</div><a href="#" class="resize"></a>');
         }
         
         var mouseX = 0;
@@ -530,11 +530,24 @@ var BlandTable = function(options) {
             $(window).on("mousemove", mousemove);
             $(window).one("mouseup",cleanup);
         });
+        $th.on("dblclick",".resize",function(evt){
+            var new_width = 0;
+            var $col = $(".col-"+column.id);
+            var orig_width = $col.width();
+            $(".col-"+column.id+" .cell-inner").each(function(i, el){
+                var $t = $(this);
+                if ($t.hasClass("filter")) return;
+                new_width = Math.max( self.config.min_col_width, $(this).outerWidth(), new_width );
+            });
+            column.width = new_width;
+            $col.css('width',new_width+'px');
+            $table.width( $table.width() + (new_width - orig_width) );
+        });
         
         return $th;
     }
     var create_filter = function(column) {
-        var $td = $('<div class="td col-'+column.id+'" style="width:'+column.width+'px;"><div class="cell-inner"></div></div>');
+        var $td = $('<div class="td col-'+column.id+'" style="width:'+column.width+'px;"><div class="cell-inner filter"></div></div>');
         var filter = false;
         switch ( typeof column.filter ) {
             case "function":
